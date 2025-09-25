@@ -1,12 +1,11 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.8'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'groovy'
 }
 
 group = 'no.fintlabs'
-sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -24,30 +23,32 @@ configurations {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 jar {
     enabled = false
 }
 
 dependencies {
+    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-7'
+    implementation "no.fint:fint-utdanning-resource-model-java:${apiVersion}"
+
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64'
-
-    implementation 'no.fintlabs:fint-core-infra-models:1.1.2'
-    implementation 'no.fintlabs:fint-core-adapter-common:0.1.2'
-    implementation "no.fint:fint-utdanning-resource-model-java:${apiVersion}"
-    implementation 'no.fint:fint-model-resource:0.4.1'
-
-    runtimeOnly 'org.springframework.boot:spring-boot-actuator'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Work-around for issue on Apple Silicon that triggers "Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider". Remove when transitioning to Netty 2
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.127.Final:osx-aarch_64'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    runtimeOnly 'org.spockframework:spock-spring:2.1-groovy-3.0'
-    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
+    testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'
 }
 
 test {

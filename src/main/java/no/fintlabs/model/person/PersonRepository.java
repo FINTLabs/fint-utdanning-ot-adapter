@@ -2,7 +2,7 @@ package no.fintlabs.model.person;
 
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.adapter.events.WriteableResourceRepository;
-import no.fintlabs.adapter.models.RequestFintEvent;
+import no.fintlabs.adapter.models.event.RequestFintEvent;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
