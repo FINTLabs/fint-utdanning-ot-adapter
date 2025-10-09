@@ -9,10 +9,8 @@ group = 'no.fintlabs'
 
 repositories {
     mavenCentral()
-    repositories {
-        maven {
-            url "https://repo.fintlabs.no/releases"
-        }
+    maven {
+        url = "https://repo.fintlabs.no/releases"
     }
     mavenLocal()
 }
