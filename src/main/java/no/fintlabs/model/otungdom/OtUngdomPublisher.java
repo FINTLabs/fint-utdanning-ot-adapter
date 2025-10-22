@@ -22,7 +22,11 @@ public class OtUngdomPublisher extends ResourcePublisher<OtUngdomResource, Resou
     @Scheduled(initialDelayString = "1000", fixedRateString = "86400000")
     public void doFullSync() {
         log.info("Start full sync for resource {}", getCapability().getEntityUri());
-        submit(SyncData.ofPostData(repository.getResources()));
+        try {
+            submit(SyncData.ofPostData(repository.getResources()));
+        } catch (Exception e) {
+            log.error("Full sync failed for resource {}", getCapability().getEntityUri(), e);
+        }
     }
 
     @Override

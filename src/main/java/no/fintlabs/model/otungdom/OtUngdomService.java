@@ -4,16 +4,14 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
-import no.fint.model.resource.felles.PersonResource;
-import no.fint.model.resource.utdanning.kodeverk.OtEnhetResource;
-import no.fint.model.resource.utdanning.kodeverk.OtStatusResource;
 import no.fint.model.resource.utdanning.ot.OtUngdomResource;
 import no.fintlabs.restutil.RestUtil;
 import no.fintlabs.restutil.model.OTUngdomData;
 import no.fintlabs.restutil.model.RequestData;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -27,34 +25,33 @@ public class OtUngdomService {
     }
 
     public List<OtUngdomResource> getOtUngdomResources() {
-        List<OtUngdomResource> otungdomResources = new ArrayList<>();
         RequestData requestData = restUtil.getRequestData().block();
 
         if (requestData != null) {
-            requestData.getOtungdommer().forEach(otUngdomData -> {
-                OtUngdomResource otungdomResource = createOtUngdomResource(otUngdomData);
-                otungdomResources.add(otungdomResource);
-            });
+            if (StringUtils.hasText(requestData.getErrorMessage())) {
+                log.error(requestData.getErrorMessage());
+            }
+            return requestData.getOtUngdommer().stream().map(this::createOtUngdomResource).toList();
+        } else {
+            return Collections.emptyList();
         }
-
-        return otungdomResources;
     }
 
     @SneakyThrows
     private OtUngdomResource createOtUngdomResource(OTUngdomData otUngdomData) {
-        OtUngdomResource otungdomResource = new OtUngdomResource();
+        OtUngdomResource otUngdomResource = new OtUngdomResource();
         String fodselsNummer = otUngdomData.getPerson().getFodselsnummer();
 
         Identifikator identifikator = new Identifikator();
         identifikator.setIdentifikatorverdi(fodselsNummer);
-        otungdomResource.setSystemId(identifikator);
+        otUngdomResource.setSystemId(identifikator);
 
-        otungdomResource.addPerson(Link.with(PersonResource.class, "fodselsnummer", fodselsNummer));
-        otungdomResource.addEnhet(Link.with(OtEnhetResource.class, "utdanning/kodeverk/otenhet/systemid", otUngdomData.getOtData().getTilknytningnr()));
-        otungdomResource.addStatus(Link.with(OtStatusResource.class, "utdanning/kodeverk/otstatus/systemid", otUngdomData.getOtData().getAktivitetskode()));
-        otungdomResource.addSelf(Link.with(OtUngdomResource.class, "systemid", fodselsNummer));
+        otUngdomResource.addPerson(new Link("fodselsnummer/" + fodselsNummer));
+        otUngdomResource.addEnhet(new Link("systemid/" + otUngdomData.getOtData().getTilknytningnr()));
+        otUngdomResource.addStatus(new Link("systemid/" + otUngdomData.getOtData().getAktivitetskode()));
+        otUngdomResource.addSelf(new Link("systemid/" + fodselsNummer));
 
-        return otungdomResource;
+        return otUngdomResource;
     }
 
 }

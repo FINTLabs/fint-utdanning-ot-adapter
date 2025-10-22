@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +35,17 @@ public class PersonService {
     public List<PersonResource> getPersonResources() {
         RequestData requestData = restUtil.getRequestData().block();
 
-        if (StringUtils.hasText(requestData.getErrorMessage())) {
-            log.error(requestData.getErrorMessage());
-        }
+        if (requestData != null) {
+            if (StringUtils.hasText(requestData.getErrorMessage())) {
+                log.error(requestData.getErrorMessage());
+            }
 
-        return requestData.getOtungdommer().stream()
-                .map(otUngdomData -> createPersonResource(otUngdomData.getPerson()))
-                .collect(Collectors.toList());
+            return requestData.getOtUngdommer().stream()
+                    .map(otUngdomData -> createPersonResource(otUngdomData.getPerson()))
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @SneakyThrows

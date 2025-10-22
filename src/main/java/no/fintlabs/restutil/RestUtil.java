@@ -10,21 +10,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 public class RestUtil {
 
     private final WebClient webClient;
+    private final String orgNumber;
+    private final String apiKey;
 
-    @Value("${fint.fylkesnr}")
-    private String orgNumber;
 
-    @Value("${fint.api-key}")
-    private String apiKey;
+    public RestUtil(@Value("${fint.vigo.ot.url}") String vigoOtUrl,
+                    @Value("${fint.fylkesnr}") String orgNumber,
+                    @Value("${fint.api-key}") String apiKey,
+                    WebClient.Builder webClientBuilder) {
+        this.orgNumber = orgNumber;
+        this.apiKey = apiKey;
+        Objects.requireNonNull(vigoOtUrl, "vigoOtUrl must not be null");
+        Objects.requireNonNull(orgNumber, "orgNumber must not be null");
+        Objects.requireNonNull(apiKey, "apiKey must not be null");
 
-    public RestUtil(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl("https://www.vigo.no/vigows/rest/ot")
+                .baseUrl(vigoOtUrl)
                 .codecs(this::configureCodecs)
                 .build();
     }

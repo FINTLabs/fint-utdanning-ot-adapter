@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/provider/heartbeat",
+
+    "headers": {
+      "Content-Type": {
+        "contains": "application/json"
+      },
+      "Authorization": {
+        "contains": "Bearer"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "Cache-Control": "no-store",
+      "Pragma": "no-cache"
+    },
+    "body": ""
+  },
+  "persistent": true,
+  "priority": 10
+}

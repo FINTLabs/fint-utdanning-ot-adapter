@@ -15,6 +15,6 @@ public class RequestData {
     private int antall;
 
     @JsonProperty("otungdommer")
-    private List<OTUngdomData> otungdommer;
+    private List<OTUngdomData> otUngdommer;
 
 }
