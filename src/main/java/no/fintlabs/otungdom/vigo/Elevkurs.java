@@ -1,4 +1,4 @@
-package no.fintlabs.restutil.model;
+package no.fintlabs.otungdom.vigo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -10,6 +10,8 @@ fint:
     registration-id: fint
     org-id: fintlabs.no
     heartbeat-interval: 1
+    sync:
+      cron: "0 0 2 * * *"
     capabilities:
       person:
         domain-name: utdanning

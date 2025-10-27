@@ -1,6 +1,7 @@
 package no.fintlabs.model.otungdom;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import no.fintlabs.otungdom.OtUngdomSync;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,11 @@ import org.wiremock.spring.InjectWireMock;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.extension.MediaType.APPLICATION_JSON;
 
@@ -32,8 +38,7 @@ import static org.junit.jupiter.api.extension.MediaType.APPLICATION_JSON;
         "fint.api-key=test-api-key",
         "spring.security.oauth2.client.provider.fint-idp.token-uri=http://localhost:${idp.port}/oauth/token"
 })
-public class OtUngdomPublisherTest {
-
+class OtUngdomSyncTest {
     @Value("${fint.adapter.id}")
     private String adapterId;
 
@@ -50,15 +55,10 @@ public class OtUngdomPublisherTest {
     WireMockServer fintProvider;
 
     @Autowired
-    private OtUngdomSubscriber otUngdomSubscriber;
+    private OtUngdomSync otUngdomSync;
 
-    /**
-     * Verify that JSON data is fetched from Vigo OT endpoint (see mappings/vigo/GET_ot.json),
-     * transformed and pushed to the FINT provider at /provider/utdanning/ot/otungdom with the
-     * expected JSON data as body.
-     */
     @Test
-    void testFullSyncOfOtUngdomFromVigoToFint() {
+    void syncOtUngdomFromVigoToFint() {
         String expectedOtUngdomResourcesJsonPost = """
                 [
                   {
@@ -95,6 +95,8 @@ public class OtUngdomPublisherTest {
                 """;
         fintProvider.stubFor(post("/provider/utdanning/ot/otungdom")
                 .willReturn(aResponse().withStatus(200)));
+
+        otUngdomSync.syncOtUngdomFromVigoToFint();
 
         await()
                 .atMost(5, TimeUnit.SECONDS)
