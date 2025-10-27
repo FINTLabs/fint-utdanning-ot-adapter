@@ -31,7 +31,7 @@ jar {
 }
 
 dependencies {
-    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-7.1'
+    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-7'
     implementation "no.fint:fint-utdanning-resource-model-java:${apiVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
