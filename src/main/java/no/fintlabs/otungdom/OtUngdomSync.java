@@ -204,8 +204,8 @@ public class OtUngdomSync {
             kontaktinformasjon.setMobiltelefonnummer(personData.getMobilnummer());
         personResource.setKontaktinformasjon(kontaktinformasjon);
 
-        personResource.addOtungdom(Link.with(OtUngdom.class, "systemid", fodselsNummer));
-        personResource.addSelf(Link.with(Person.class, "fodselsnummer", fodselsNummer));
+        personResource.addOtungdom(Link.with("systemid/" + fodselsNummer));
+        personResource.addSelf(Link.with("fodselsnummer/" + fodselsNummer));
 
         return personResource;
     }
