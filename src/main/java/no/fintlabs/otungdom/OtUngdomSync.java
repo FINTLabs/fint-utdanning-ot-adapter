@@ -49,6 +49,9 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class OtUngdomSync {
+
+    private final static int CONCURRENT_FULL_SYNCS = 2;
+
     private final AdapterProperties adapterProperties;
     private final SimpleDateFormat dateFormat;
 
@@ -206,7 +209,7 @@ public class OtUngdomSync {
 
         Instant start = Instant.now();
         List<SyncPage> pages = this.createSyncPages(syncData.getResources(), syncData.getSyncType());
-        int maxConcurrentSendRequests = Runtime.getRuntime().availableProcessors();
+        int maxConcurrentSendRequests = Runtime.getRuntime().availableProcessors() / CONCURRENT_FULL_SYNCS;
         return Flux.fromIterable(pages)
                 .flatMap(this::sendPage, maxConcurrentSendRequests)
                 .doOnComplete(() -> this.logDuration(syncData.getResources().size(), start))
