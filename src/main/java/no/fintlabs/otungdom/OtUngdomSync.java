@@ -49,9 +49,6 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class OtUngdomSync {
-
-    private final static int CONCURRENT_FULL_SYNCS = 2;
-
     private final AdapterProperties adapterProperties;
     private final SimpleDateFormat dateFormat;
 
@@ -140,13 +137,32 @@ public class OtUngdomSync {
                 .map(this::transformToFintPerson)
                 .toList();
 
-        // Push both batches in parallel and join with Mono.when
-        Mono<Void> ungdomPush = pushFintResources(fintOtUngdomer);
-        Mono<Void> personerPush = pushFintResources(fintPersoner);
+        String otUngdomUri = getCapability("otungdom").getEntityUri();
+        String personUri = getCapability("person").getEntityUri();
 
-        // Wait for both operations to complete
+        int perSyncConcurrency = calculatePerSyncConcurrency(otUngdomData, fintPersoner);
+
+        Mono<Void> ungdomPush = fintOtUngdomer.isEmpty()
+                ? Mono.empty()
+                : pushFintResources(fintOtUngdomer, otUngdomUri, perSyncConcurrency);
+
+        Mono<Void> personerPush = fintPersoner.isEmpty()
+                ? Mono.empty()
+                : pushFintResources(fintPersoner, personUri, perSyncConcurrency);
+
         return Mono.when(ungdomPush, personerPush);
     }
+
+    /**
+     * Calculates per-sync concurrency by dividing available processors
+     * evenly across active syncs (OT-ungdom and Person).
+     * Ensures at least one concurrent worker.
+     */
+    private int calculatePerSyncConcurrency(List<?> ungdommer, List<?> personer) {
+        int parallelSyncs = (ungdommer.isEmpty() ? 0 : 1) + (personer.isEmpty() ? 0 : 1);
+        return Math.max(1, Runtime.getRuntime().availableProcessors() / Math.max(1, parallelSyncs));
+    }
+
 
     private OtUngdomResource transformToFintOtUngdom(OTUngdomData vigoUngdom) {
         OtUngdomResource otUngdomResource = new OtUngdomResource();
@@ -202,28 +218,27 @@ public class OtUngdomSync {
         }
     }
 
-    private <T extends FintResource> Mono<Void> pushFintResources(List<T> fintResources) {
+    private <T extends FintResource> Mono<Void> pushFintResources(List<T> fintResources, String capabilityUri, int concurrency) {
         log.debug("Pushing batch of {} FINT resources", fintResources.size());
 
-        SyncData<FintResource> syncData = (SyncData<FintResource>) SyncData.ofPostData(fintResources);
+        SyncData<T> syncData = SyncData.ofPostData(fintResources);
 
         Instant start = Instant.now();
-        List<SyncPage> pages = this.createSyncPages(syncData.getResources(), syncData.getSyncType());
-        int maxConcurrentSendRequests = Runtime.getRuntime().availableProcessors() / CONCURRENT_FULL_SYNCS;
+        List<SyncPage> pages = this.createSyncPages(syncData.getResources(), syncData.getSyncType(), capabilityUri);
         return Flux.fromIterable(pages)
-                .flatMap(this::sendPage, maxConcurrentSendRequests)
+                .flatMap(this::sendPage, concurrency)
                 .doOnComplete(() -> this.logDuration(syncData.getResources().size(), start))
                 .then();
     }
 
-    public <T extends FintResource> List<SyncPage> createSyncPages(List<T> resources, SyncType syncType) {
+    public <T extends FintResource> List<SyncPage> createSyncPages(List<T> resources, SyncType syncType, String capabilityUri) {
         String corrId = UUID.randomUUID().toString();
         int resourceSize = resources.size();
         int amountOfPages = (resourceSize + this.pageSize - 1) / this.pageSize;
         List<SyncPage> pages = new ArrayList<>();
 
         for (int resourceIndex = 0; resourceIndex < resourceSize; resourceIndex += this.pageSize) {
-            SyncPage syncPage = this.createSyncPage(corrId, resources, syncType, resourceSize, amountOfPages, resourceIndex);
+            SyncPage syncPage = this.createSyncPage(corrId, resources, syncType, resourceSize, amountOfPages, resourceIndex, capabilityUri);
             pages.add(syncPage);
         }
 
@@ -234,9 +249,9 @@ public class OtUngdomSync {
         return pages;
     }
 
-    private <T extends FintResource> SyncPage createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex) {
+    private <T extends FintResource> SyncPage createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex, String capabilityUri) {
         List<SyncPageEntry> syncPageEntries = this.createSyncPageEntries(resources, resourceIndex);
-        SyncPageMetadata syncPageMetadata = this.getSyncPageMetadata(corrId, resourceSize, totalPages, resourceIndex, syncPageEntries);
+        SyncPageMetadata syncPageMetadata = this.getSyncPageMetadata(corrId, resourceSize, totalPages, resourceIndex, syncPageEntries, capabilityUri);
         return FullSyncPage.builder().metadata(syncPageMetadata).resources(syncPageEntries).syncType(syncType).build();
     }
 
@@ -252,7 +267,7 @@ public class OtUngdomSync {
         return SyncPageEntry.of(fintIdentifikator.getIdentifikatorverdi(), resource);
     }
 
-    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry> entries) {
+    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry> entries, String capabilityUri) {
         String adapterId = this.adapterProperties.getId();
         String orgId = this.adapterProperties.getOrgId();
         int pageNo = i / this.pageSize + 1;
@@ -265,7 +280,7 @@ public class OtUngdomSync {
                 .totalSize(resourceAmount)
                 .pageSize(entries.size())
                 .page(pageNo)
-                .uriRef(this.getCapability().getEntityUri())
+                .uriRef(capabilityUri)
                 .time(System.currentTimeMillis())
                 .build();
     }
@@ -273,13 +288,18 @@ public class OtUngdomSync {
     private Mono<?> sendPage(SyncPage page) {
         return this.fintWebClient
                 .method(page.getSyncType().getHttpMethod())
-                .uri("/provider" + this.getCapability().getEntityUri())
+                .uri("/provider" + page.getMetadata().getUriRef())
                 .body(Mono.just(page), SyncPage.class)
                 .retrieve()
                 .toBodilessEntity()
                 .flatMap(response -> {
                     if (response.getStatusCode().is2xxSuccessful()) {
-                        log.debug("Posted {} sync page {} of {} with {} resources", page.getSyncType(), page.getMetadata().getPage(), page.getMetadata().getTotalPages(), page.getResources().size());
+                        log.debug("Posted {} sync page {}/{} with {} resources to {}",
+                                page.getSyncType(),
+                                page.getMetadata().getPage(),
+                                page.getMetadata().getTotalPages(),
+                                page.getResources().size(),
+                                page.getMetadata().getUriRef());
                         return Mono.empty();
                     } else {
                         return Mono.error(new WebClientResponseException(
@@ -305,7 +325,7 @@ public class OtUngdomSync {
         log.debug("Syncing {} resources in {} pages took {}:{}:{} to complete", resourceSize, amountOfPages, "%02d".formatted(timeElapsed.toHoursPart()), "%02d".formatted(timeElapsed.toMinutesPart()), "%02d".formatted(timeElapsed.toSecondsPart()));
     }
 
-    private AdapterCapability getCapability() {
-        return adapterProperties.getCapabilityByResource("otungdom");
+    private AdapterCapability getCapability(String resource) {
+        return adapterProperties.getCapabilityByResource(resource);
     }
 }
