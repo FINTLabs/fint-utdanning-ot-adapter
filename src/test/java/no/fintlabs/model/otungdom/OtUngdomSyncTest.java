@@ -1,6 +1,7 @@
 package no.fintlabs.model.otungdom;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import no.fintlabs.adapter.HeartbeatService;
 import no.fintlabs.otungdom.OtUngdomSync;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
@@ -16,11 +18,6 @@ import org.wiremock.spring.InjectWireMock;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.extension.MediaType.APPLICATION_JSON;
 
@@ -53,6 +50,9 @@ class OtUngdomSyncTest {
 
     @InjectWireMock("fint-provider")
     WireMockServer fintProvider;
+
+    @MockitoBean
+    private HeartbeatService heartbeatService;
 
     @Autowired
     private OtUngdomSync otUngdomSync;
