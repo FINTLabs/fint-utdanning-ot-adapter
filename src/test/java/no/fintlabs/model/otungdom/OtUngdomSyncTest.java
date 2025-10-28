@@ -51,7 +51,7 @@ class OtUngdomSyncTest {
     @InjectWireMock("fint-provider")
     WireMockServer fintProvider;
 
-    @MockitoBean
+    @MockitoBean // TODO: Remove this when the adapter-common library uses the provider webclient as @Primary
     private HeartbeatService heartbeatService;
 
     @Autowired
