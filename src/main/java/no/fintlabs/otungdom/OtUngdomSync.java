@@ -140,29 +140,20 @@ public class OtUngdomSync {
         String otUngdomUri = getCapability("otungdom").getEntityUri();
         String personUri = getCapability("person").getEntityUri();
 
-        int perSyncConcurrency = calculatePerSyncConcurrency(otUngdomData, fintPersoner);
-
         Mono<Void> ungdomPush = fintOtUngdomer.isEmpty()
                 ? Mono.empty()
-                : pushFintResources(fintOtUngdomer, otUngdomUri, perSyncConcurrency);
+                : pushFintResources(fintOtUngdomer, otUngdomUri);
 
         Mono<Void> personerPush = fintPersoner.isEmpty()
                 ? Mono.empty()
-                : pushFintResources(fintPersoner, personUri, perSyncConcurrency);
+                : pushFintResources(fintPersoner, personUri);
 
         return Mono.when(ungdomPush, personerPush);
     }
 
-    /**
-     * Calculates per-sync concurrency by dividing available processors
-     * evenly across active syncs (OT-ungdom and Person).
-     * Ensures at least one concurrent worker.
-     */
-    private int calculatePerSyncConcurrency(List<?> ungdommer, List<?> personer) {
-        int parallelSyncs = (ungdommer.isEmpty() ? 0 : 1) + (personer.isEmpty() ? 0 : 1);
-        return Math.max(1, Runtime.getRuntime().availableProcessors() / Math.max(1, parallelSyncs));
+    private int calculatePerSyncConcurrency() {
+        return Runtime.getRuntime().availableProcessors() / 2;
     }
-
 
     private OtUngdomResource transformToFintOtUngdom(OTUngdomData vigoUngdom) {
         OtUngdomResource otUngdomResource = new OtUngdomResource();
@@ -218,7 +209,7 @@ public class OtUngdomSync {
         }
     }
 
-    private <T extends FintResource> Mono<Void> pushFintResources(List<T> fintResources, String capabilityUri, int concurrency) {
+    private <T extends FintResource> Mono<Void> pushFintResources(List<T> fintResources, String capabilityUri) {
         log.debug("Pushing batch of {} FINT resources", fintResources.size());
 
         SyncData<T> syncData = SyncData.ofPostData(fintResources);
@@ -226,7 +217,7 @@ public class OtUngdomSync {
         Instant start = Instant.now();
         List<SyncPage> pages = this.createSyncPages(syncData.getResources(), syncData.getSyncType(), capabilityUri);
         return Flux.fromIterable(pages)
-                .flatMap(this::sendPage, concurrency)
+                .flatMap(this::sendPage, calculatePerSyncConcurrency())
                 .doOnComplete(() -> this.logDuration(syncData.getResources().size(), start))
                 .then();
     }
