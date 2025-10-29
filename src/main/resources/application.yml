@@ -27,6 +27,8 @@ fint:
         deltaSyncInterval: IMMEDIATE
 
 spring:
+  main:
+    web-application-type: none
   security:
     oauth2:
       client:
