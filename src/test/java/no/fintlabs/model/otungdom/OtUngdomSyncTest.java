@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,8 +34,10 @@ import static org.junit.jupiter.api.extension.MediaType.APPLICATION_JSON;
         "fint.vigo.ot.url=http://localhost:${vigo.port}",
         "fint.fylkesnr=42",
         "fint.api-key=test-api-key",
-        "spring.security.oauth2.client.provider.fint-idp.token-uri=http://localhost:${idp.port}/oauth/token"
+        "spring.security.oauth2.client.provider.fint-idp.token-uri=http://localhost:${idp.port}/oauth/token",
+        "fint.sync.enabled=false"
 })
+@ActiveProfiles("test")
 class OtUngdomSyncTest {
     @Value("${fint.adapter.id}")
     private String adapterId;
