@@ -1,7 +1,6 @@
 package no.fintlabs.model.otungdom;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import no.fintlabs.adapter.HeartbeatService;
 import no.fintlabs.otungdom.OtUngdomSync;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
@@ -53,9 +51,6 @@ class OtUngdomSyncTest {
 
     @InjectWireMock("fint-provider")
     WireMockServer fintProvider;
-
-    @MockitoBean // TODO: Remove this when the adapter-common library uses the provider webclient as @Primary
-    private HeartbeatService heartbeatService;
 
     @Autowired
     private OtUngdomSync otUngdomSync;
