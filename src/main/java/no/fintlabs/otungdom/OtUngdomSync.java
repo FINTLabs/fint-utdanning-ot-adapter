@@ -1,7 +1,9 @@
 package no.fintlabs.otungdom;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.FintIdentifikator;
+import no.fint.model.felles.Person;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
 import no.fint.model.felles.kompleksedatatyper.Personnavn;
@@ -9,6 +11,7 @@ import no.fint.model.resource.FintResource;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.ot.OtUngdomResource;
+import no.fint.model.utdanning.ot.OtUngdom;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.datasync.SyncData;
 import no.fintlabs.adapter.models.AdapterCapability;
@@ -20,6 +23,7 @@ import no.fintlabs.otungdom.vigo.PersonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -70,12 +74,18 @@ public class OtUngdomSync {
     /**
      * Fetches Vigo OT ungdom, transform to FINT resources and push as full-sync to FINT.
      */
-    public Mono<Void> syncOtUngdomFromVigoToFint() {
+    @PostConstruct
+    public void syncOtUngdomFromVigoToFint() {
         log.info("Full sync of OT ungdom from Vigo to FINT started");
-        return fetchOtUngdomData()
+
+        fetchOtUngdomData()
                 .flatMap(this::processOtUngdomData)
                 .doOnSuccess(unused -> log.info("OT ungdom processing pipeline completed"))
-                .doOnError(error -> log.error("OT ungdom processing pipeline failed", error));
+                .doOnError(error -> log.error("OT ungdom processing pipeline failed", error))
+                .subscribe(
+                        unused -> log.info("OT ungdom full-sync completed successfully"),
+                        error -> log.error("OT ungdom full-sync failed", error)
+                );
     }
 
     /**

@@ -58,7 +58,7 @@ class OtUngdomSyncTest {
     private OtUngdomSync otUngdomSync;
 
     @Test
-    void syncOtUngdomFromVigoToFint() {
+    void syncOtUngdomFromVigoToFintAfterInitialization() {
         String expectedOtUngdomResourcesJsonPost = expectedOtUngdomResourcesJsonPost();
         String expectedPersonResourcesJsonPost = expectedPersonResourcesJsonPost();
 
@@ -67,7 +67,6 @@ class OtUngdomSyncTest {
         fintProvider.stubFor(post("/provider/utdanning/ot/person")
                 .willReturn(aResponse().withStatus(200)));
 
-        otUngdomSync.syncOtUngdomFromVigoToFint();
 
         await().atMost(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
