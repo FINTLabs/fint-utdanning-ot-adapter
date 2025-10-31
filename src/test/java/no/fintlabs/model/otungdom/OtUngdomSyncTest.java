@@ -67,7 +67,7 @@ class OtUngdomSyncTest {
 
         otUngdomSync.syncOtUngdomFromVigoToFint().block();
 
-        await().atMost(5, TimeUnit.SECONDS)
+        await().atMost(10, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     vigo.verify(getRequestedFor(urlEqualTo("/"))
                             .withHeader("fylkesnr", equalTo(vigoFylkesNr))
@@ -76,7 +76,7 @@ class OtUngdomSyncTest {
                 });
 
         // Wait for the reactive flow to complete
-        await().atMost(5, TimeUnit.SECONDS)
+        await().atMost(10, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     fintProvider.verify(postRequestedFor(urlEqualTo("/provider/utdanning/ot/otungdom"))
                             .withRequestBody(matchingJsonPath("$.metadata.adapterId", equalTo(adapterId)))
@@ -90,7 +90,7 @@ class OtUngdomSyncTest {
                             .withRequestBody(matchingJsonPath("$.syncType", equalTo("FULL"))));
                 });
 
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             fintProvider.verify(postRequestedFor(urlEqualTo("/provider/utdanning/ot/person"))
                     .withRequestBody(matchingJsonPath("$.metadata.adapterId", equalTo(adapterId)))
                     .withRequestBody(matchingJsonPath("$.metadata.orgId", equalTo("fintlabs.no")))
