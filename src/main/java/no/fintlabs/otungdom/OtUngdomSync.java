@@ -27,14 +27,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 /**
  * This is a FINT adapter that synchronized OT ungdom data from Vigo to FINT.
@@ -46,8 +45,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class OtUngdomSync {
+    static final ZoneId NORWEGIAN_ZONE_ID = ZoneId.of("Europe/Oslo");
+    static final Locale NORWEGIAN_LOCALE = Locale.of("NO");
+
     private final AdapterProperties adapterProperties;
-    private final SimpleDateFormat dateFormat;
+    private final DateTimeFormatter dateFormatter;
 
     private final WebClient vigoOtWebClient;
     private final int pageSize;
@@ -64,7 +66,7 @@ public class OtUngdomSync {
         this.fintWebClient = webClient;
         this.vigoOtWebClient = vigoOtWebClient;
         this.pageSize = pageSize;
-        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        this.dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", NORWEGIAN_LOCALE);
     }
 
     /**
@@ -168,8 +170,9 @@ public class OtUngdomSync {
         PersonData personData = vigoUngdom.getPerson();
         String fodselsNummer = personData.getFodselsnummer();
 
-        if (!personData.getFodselsdato().isEmpty())
+        if (!personData.getFodselsdato().isEmpty()) {
             personResource.setFodselsdato(parseDate(personData.getFodselsdato()));
+        }
 
         Identifikator identifikator = new Identifikator();
         identifikator.setIdentifikatorverdi(fodselsNummer);
@@ -181,10 +184,12 @@ public class OtUngdomSync {
         personResource.setNavn(personnavn);
 
         Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon();
-        if (!personData.getEpost().isEmpty())
+        if (!personData.getEpost().isEmpty()) {
             kontaktinformasjon.setEpostadresse(personData.getEpost());
-        if (!personData.getMobilnummer().isEmpty())
+        }
+        if (!personData.getMobilnummer().isEmpty()) {
             kontaktinformasjon.setMobiltelefonnummer(personData.getMobilnummer());
+        }
         personResource.setKontaktinformasjon(kontaktinformasjon);
 
         personResource.addOtungdom(Link.with("systemid/" + fodselsNummer));
@@ -195,8 +200,9 @@ public class OtUngdomSync {
 
     private Date parseDate(String dateString) {
         try {
-            return dateFormat.parse(dateString);
-        } catch (ParseException e) {
+            LocalDate date = LocalDate.parse(dateString, dateFormatter);
+            return Date.from(date.atStartOfDay(NORWEGIAN_ZONE_ID).toInstant());
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
