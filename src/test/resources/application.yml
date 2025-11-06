@@ -1,7 +1,4 @@
 fint:
-  vigo:
-    ot:
-      url: https://www.vigo.no/vigows/rest/ot
   adapter:
     id: https://vigoiks.no/fintlabs-no/utdanning/ot
     password: ${fint.core.oauth2.password}
@@ -12,6 +9,7 @@ fint:
     heartbeat-interval: 1
     sync:
       cron: "0 0 2 * * *"
+    debug: true
     capabilities:
       person:
         domain-name: utdanning
@@ -26,9 +24,15 @@ fint:
         fullSyncIntervalInDays: 1
         deltaSyncInterval: IMMEDIATE
 
+  core:
+    oauth2:
+      username: fint-core-oauth2-username
+      password: fint-core-oauth2-password
+
 spring:
   main:
-    web-application-type: none
+    lazy-initialization: true
+    log-startup-info: true
   security:
     oauth2:
       client:
@@ -42,3 +46,5 @@ spring:
             client-secret: ${fint.core.oauth2.client-secret}
             provider: fint-idp
             scope: fint-adapter
+
+

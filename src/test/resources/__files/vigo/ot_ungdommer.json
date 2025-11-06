@@ -1,0 +1,26 @@
+{
+  "antall": 1,
+  "otungdommer": [
+    {
+      "person": {
+        "fornavn": "Foo 1",
+        "etternavn" : "Bar 1",
+        "fdato": "01.02.2003",
+        "fnr": "0102200312345",
+        "epost": "foo.bar.1@test.no",
+        "mobilnr": "11111111"
+      },
+      "otData": {
+        "tilknytningnr": "11",
+        "tilknytningnavn": "foo",
+        "aktivitetskode": "f1"
+      },
+      "elevkurs": {
+        "promrkode": "PK1",
+        "promrnavn": "PK_TEST",
+        "start": "10.11.2025",
+        "slutt": "10.12.2025"
+      }
+    }
+  ]
+}

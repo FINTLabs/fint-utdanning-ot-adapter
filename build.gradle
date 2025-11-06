@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.5.6'
+    id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'groovy'
@@ -9,10 +9,8 @@ group = 'no.fintlabs'
 
 repositories {
     mavenCentral()
-    repositories {
-        maven {
-            url "https://repo.fintlabs.no/releases"
-        }
+    maven {
+        url = "https://repo.fintlabs.no/releases"
     }
     mavenLocal()
 }
@@ -33,7 +31,7 @@ jar {
 }
 
 dependencies {
-    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-7'
+    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-8'
     implementation "no.fint:fint-utdanning-resource-model-java:${apiVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -46,6 +44,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Test dependencies
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.wiremock:wiremock-standalone:3.9.1'
+    testImplementation 'org.awaitility:awaitility:4.2.2'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.10.6'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
     testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'

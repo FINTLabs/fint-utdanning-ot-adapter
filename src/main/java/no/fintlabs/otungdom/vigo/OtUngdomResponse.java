@@ -1,12 +1,15 @@
-package no.fintlabs.restutil.model;
+package no.fintlabs.otungdom.vigo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Response body from a Vigo OT endpoint.
+ */
 @Data
-public class RequestData {
+public class OtUngdomResponse {
 
     @JsonProperty("errorMessage")
     private String errorMessage;
@@ -15,6 +18,6 @@ public class RequestData {
     private int antall;
 
     @JsonProperty("otungdommer")
-    private List<OTUngdomData> otungdommer;
+    private List<OTUngdomData> otUngdommer;
 
 }

@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/oauth/token",
+
+    "headers": {
+      "Content-Type": {
+        "contains": "application/x-www-form-urlencoded"
+      },
+      "Authorization": {
+        "contains": "Basic"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "Cache-Control": "no-store",
+      "Pragma": "no-cache"
+    },
+    "body": "{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJibG9iYmVyLWtleS0xIn0.eyJleHAiOjE3MzAwMDAwMDAsImlhdCI6MTczMDAwMDAwMCwic3ViIjoiZmFsdmlZS3JNbE9oU3pZRWp6T1RReVFDa3F1d0hNR2R2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zIiwiYXVkIjpbImZpbmthZG1pbiIsImZpbmtyZWFkIiwiZmludHdyaXRlIl0sInRva2VuX3VzZSI6WyJhY2Nlc3MiXSwiYXV0aF90aW1lIjoxNzMwMDAwMDAwLCJzZXNzaW9uX3N0YXRlIjoiMzU2MjE1Y2EtYjQ1MS00ZTAzLTgwYzMtZDE3ZDU2NTc3ZTY5IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIiXSwicmVhbG1zIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hLWF1dGhvcml6YXRpb24iLCJhbXBhc3N5LWF1dGhvcml6YXRpb24iLCJjbGllbnQtcm9sZXMtcmVhZCIsImFjY291bnQtbGluayIsInJvb3QiLCJhY2NvdW50X2V4cGlyZXMiLCJ2aWV3LXByb2ZpbGUiLCJtYW5hZ2UtYWNjb3VudCIsImZpbmthZG1pbiIsImZpbmtyZWFkIiwiZmludHdyaXRlIl19LCJhenAiOiJmaW50LWFkbWluIiwibm9uY2UiOiJmYWx2aVktS3JtTE9oc1pZRWp6T1RReVFDa3F1d0hNR2R2IiwicmVhbG1zL3JvbGUiOlsiY2xpZW50LXJvbGVzLXJlYWQiLCJyb290Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWEtYXV0aG9yaXphdGlvbiIsImFtcGFzc3ktYXV0aG9yaXphdGlvbiIsImFjY291bnQtbGluayIsImFjY291bnRfZXhwaXJlcyIsIm1hbmFnZS1hY2NvdW50Iiwidmlldy1wcm9maWxlIiwiZmludGFkbWluIiwibm9uZSIsImZpbmtyZWFkIiwiZmludHdyaXRlIl0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50Iiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJmaW50LWFkbWluIGZpbmtyZWFkIGZpbndyaXRlIiwidGllcl9uYW1lIjoidGllci1kZXYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJGaW50IEFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZmFsdmlZK0tybUxPaHN6WUVqek9UUXlRQ2txdXdITUd2IiwiaWRlbnRpdHkiOnsicmVhbG1zL2F1dGhlbnRpY2F0aW9uIjoxNzMwMDAwMDAwfSwiYWN0aXZhdGVkIjp0cnVlfQ.SIGNATURE_PLACEHOLDER\",\n  \"token_type\": \"Bearer\",\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJiZWxsc19rZXkifQ.eyJleHAiOjE3MzAwMDAwMDAsImlhdCI6MTczMDAwMDAwMCwic3ViIjoiZmFsdmlZS3JNbE9oU3pZRWp6T1RReVFDa3F1d0hNR2R2In0.SIGNATURE_PLACEHOLDER\",\n  \"expires_in\": 3600,\n  \"scope\": \"fint-adapter\"\n}",
+    "transformers": ["response-template"],
+    "transformerParameters": {
+      "accessTokenExpiry": "{{now offset=+1h format='epoch'}}",
+      "refreshTokenExpiry": "{{now offset=+7d format='epoch'}}"
+    }
+  },
+  "persistent": true,
+  "priority": 10
+}
