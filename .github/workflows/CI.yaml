@@ -37,14 +37,14 @@ jobs:
           cp ./build/libs/${GITHUB_REPOSITORY#*/}-*.jar ./data/app.jar
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{steps.get_repo.outputs.REPO}}
           path: ./data/app.jar
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-reports
           path: build/reports/tests/test/
