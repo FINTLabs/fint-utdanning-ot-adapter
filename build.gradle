@@ -47,7 +47,7 @@ dependencies {
     // Test dependencies
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
-    testImplementation 'org.awaitility:awaitility:4.2.2'
+    testImplementation 'org.awaitility:awaitility:4.3.0'
     testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.0.8'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
