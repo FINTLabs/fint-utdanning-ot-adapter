@@ -1,4 +1,7 @@
 fint:
+  vigo:
+    ot:
+      url: https://www.vigo.no/vigows/rest/ot
   adapter:
     id: https://vigoiks.no/fintlabs-no/utdanning/ot
     password: ${fint.core.oauth2.password}
