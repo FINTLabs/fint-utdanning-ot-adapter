@@ -1,7 +1,7 @@
 apiVersion: fintlabs.no/v1alpha1
-kind: Application
+kind: Job
 metadata:
-  name: fint-utdanning-ot-adapter
+  name: fint-utdanning-ot-adapter-job
   namespace: fintlabs-no
   labels:
     app.kubernetes.io/name: fint-utdanning-ot-adapter
@@ -16,6 +16,7 @@ spec:
   imagePullPolicy: Always
   orgId: fintlabs.no
   image: ghcr.io/fintlabs/fint-utdanning-ot-adapter:sha-0000000
+  schedule: "0 2 * * *" # At 02:00 every day
   env:
     - name: JAVA_TOOL_OPTIONS
       value: '-XX:+ExitOnOutOfMemoryError -Xmx512M'
@@ -27,6 +28,8 @@ spec:
       value: 'org-dot'
     - name: fint.adapter.id
       value: https://vigoiks.no/fintlabs-no/utdanning/ot
+    - name: fint.vigo.ot.url
+      value: 'https://www.vigo.no/vigows/rest/ot'
   envFrom:
     - secretRef:
         name: fint-utdanning-ot-adapter-op
