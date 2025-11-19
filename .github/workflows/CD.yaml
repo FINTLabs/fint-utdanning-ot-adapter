@@ -1,8 +1,11 @@
 name: CD
 
 on:
-  repository_dispatch:
-    types: [trigger-cd]
+  workflow_call:
+    inputs:
+      cluster:
+        required: true
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -61,10 +64,7 @@ jobs:
           - rogfk-no
           - agderfk-no
         cluster:
-#          - aks-alpha-fint-2021-11-18
-          - aks-beta-fint-2021-11-23
-          - aks-api-fint-2022-02-08
-#          - aks-pwf-fint-2021-10-20
+          - ${{ inputs.cluster }}
 
     steps:
       - name: Checkout repository
@@ -74,7 +74,7 @@ jobs:
         uses: actions/github-script@v8
         id: environment
         with:
-          script: return '${{ matrix.cluster }}'.split('-')[1]
+          script: return '${{ inputs.cluster }}'.split('-')[1]
           result-encoding: string
 
       - name: Get resource group name
