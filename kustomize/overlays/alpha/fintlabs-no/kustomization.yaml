@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: fintlabs-no
+resources:
+  - ../../../base
+commonLabels:
+  app.kubernetes.io/name: fint-utdanning-ot-adapter
+  app.kubernetes.io/instance: fint-utdanning-ot-adapter_fintlabs_no
+  app.kubernetes.io/version: latest
+  app.kubernetes.io/component: adapter
+  app.kubernetes.io/part-of: fint-core
+  fintlabs.no/team: core
+  fintlabs.no/org-id: fintlabs.no
+
+patches:
+  - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-utdanning-ot-adapter_fintlabs_no"
+      - op: replace
+        path: "/spec/orgId"
+        value: "fintlabs.no"
+      - op: replace
+        path: "/spec/env/1/value"
+        value: "0"
+      - op: replace
+        path: "/spec/env/2/value"
+        value: "https://alpha.felleskomponent.no"
+      - op: replace
+        path: "/spec/env/3/value"
+        value: "fintlabs.no"
+      - op: replace
+        path: "/spec/env/4/value"
+        value: https://vigoiks.no/fintlabs-no/utdanning/ot
+      - op: replace
+        path: "/spec/onePassword/itemPath"
+        value: "vaults/aks-alpha-vault/items/fint-utdanning-ot-adapter"
+    target:
+      kind: Application
+      name: fint-utdanning-ot-adapter
+
+  - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-utdanning-ot-adapter_fintlabs_no"
+      - op: replace
+        path: "/spec/orgId"
+        value: "fintlabs.no"
+    target:
+      kind: FintAdapter
+      name: utdanning-ot-adapter
