@@ -1,7 +1,7 @@
 apiVersion: fintlabs.no/v1alpha1
 kind: Job
 metadata:
-  name: fint-utdanning-ot-adapter-job
+  name: fint-utdanning-ot-adapter
   namespace: fintlabs-no
   labels:
     app.kubernetes.io/name: fint-utdanning-ot-adapter
