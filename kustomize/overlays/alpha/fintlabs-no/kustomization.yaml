@@ -36,7 +36,7 @@ patches:
         path: "/spec/onePassword/itemPath"
         value: "vaults/aks-alpha-vault/items/fint-utdanning-ot-adapter"
     target:
-      kind: Application
+      kind: Job
       name: fint-utdanning-ot-adapter
 
   - patch: |-
