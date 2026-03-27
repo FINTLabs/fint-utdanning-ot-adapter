@@ -31,8 +31,8 @@ jar {
 }
 
 dependencies {
-    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-8'
-    implementation "no.fint:fint-utdanning-resource-model-java:${apiVersion}"
+    implementation 'no.fintlabs:fint-core-adapter-common:0.1.6-rc-9'
+    implementation "no.novari:fint-utdanning-resource-model-java:${apiVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
