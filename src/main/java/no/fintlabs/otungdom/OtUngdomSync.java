@@ -1,14 +1,14 @@
 package no.fintlabs.otungdom;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.FintIdentifikator;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
-import no.fint.model.felles.kompleksedatatyper.Personnavn;
-import no.fint.model.resource.FintResource;
-import no.fint.model.resource.Link;
-import no.fint.model.resource.felles.PersonResource;
-import no.fint.model.resource.utdanning.ot.OtUngdomResource;
+import no.novari.fint.model.FintIdentifikator;
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator;
+import no.novari.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
+import no.novari.fint.model.felles.kompleksedatatyper.Personnavn;
+import no.novari.fint.model.resource.FintResource;
+import no.novari.fint.model.resource.Link;
+import no.novari.fint.model.resource.felles.PersonResource;
+import no.novari.fint.model.resource.utdanning.ot.OtUngdomResource;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.datasync.SyncData;
 import no.fintlabs.adapter.models.AdapterCapability;
