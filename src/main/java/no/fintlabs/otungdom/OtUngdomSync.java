@@ -146,7 +146,8 @@ public class OtUngdomSync {
     }
 
     private int calculatePerSyncConcurrency() {
-        return Runtime.getRuntime().availableProcessors() / 2;
+        int cores = Runtime.getRuntime().availableProcessors();
+        return Math.max(1, cores / 2);
     }
 
     private OtUngdomResource transformToFintOtUngdom(OTUngdomData vigoUngdom) {
