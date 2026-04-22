@@ -29,6 +29,8 @@ spec:
       value: https://vigoiks.no/fintlabs-no/utdanning/ot
     - name: fint.vigo.ot.url
       value: 'https://www.vigo.no/vigows/rest/ot'
+    - name: fint.sync.enabled # Remove this when adding flaisjob
+      value: 'false'
   envFrom:
     - secretRef:
         name: fint-utdanning-ot-adapter-op
