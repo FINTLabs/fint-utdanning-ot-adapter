@@ -15,7 +15,7 @@ spec:
   imagePullPolicy: Always
   orgId: fintlabs.no
   image: ghcr.io/fintlabs/fint-utdanning-ot-adapter:sha-0000000
-  schedule: "0 2 * * *" # At 02:00 every day. Turn on again when deploying flaisjob
+  schedule: "*/10 * * * *" # At 02:00 every day
   env:
     - name: JAVA_TOOL_OPTIONS
       value: '-XX:+ExitOnOutOfMemoryError -Xmx512M'
