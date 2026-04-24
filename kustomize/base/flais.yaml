@@ -1,5 +1,5 @@
 apiVersion: fintlabs.no/v1alpha1
-kind: Application # Change to Job when ready for flaisjob
+kind: Job
 metadata:
   name: fint-utdanning-ot-adapter
   namespace: fintlabs-no
@@ -15,7 +15,7 @@ spec:
   imagePullPolicy: Always
   orgId: fintlabs.no
   image: ghcr.io/fintlabs/fint-utdanning-ot-adapter:sha-0000000
-#  schedule: "0 2 * * *" # At 02:00 every day. Turn on again when deploying flaisjob
+  schedule: "0 2 * * *" # At 02:00 every day. Turn on again when deploying flaisjob
   env:
     - name: JAVA_TOOL_OPTIONS
       value: '-XX:+ExitOnOutOfMemoryError -Xmx512M'
@@ -29,8 +29,6 @@ spec:
       value: https://vigoiks.no/fintlabs-no/utdanning/ot
     - name: fint.vigo.ot.url
       value: 'https://www.vigo.no/vigows/rest/ot'
-    - name: fint.sync.enabled # Remove this when adding flaisjob
-      value: 'false'
   envFrom:
     - secretRef:
         name: fint-utdanning-ot-adapter-op
