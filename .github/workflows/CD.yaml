@@ -19,32 +19,37 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tags: ${{ steps.meta.outputs.tags }}
+      tags: ${{ steps.set-tag.outputs.tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5.0.0
+      - name: Set image tag
+        id: set-tag
+        run: echo "tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
-      - name: Login to Docker Hub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
+      - name: Check if image already exists
+        id: image-check
+        run: |
+          if docker manifest inspect "${{ steps.set-tag.outputs.tag }}" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build and push Docker image
+        if: steps.image-check.outputs.exists == 'false'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.set-tag.outputs.tag }}
 
   # Conditionally set which namespaces to deploy to, based on which cluster we're deploying to
   init:
