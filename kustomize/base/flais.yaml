@@ -29,6 +29,9 @@ spec:
       value: https://vigoiks.no/fintlabs-no/utdanning/ot
     - name: fint.vigo.ot.url
       value: 'https://www.vigo.no/vigows/rest/ot'
+    # Java4Shell (CVE-2026-114938): turn off the Base64 intrinsic until the JDK has a fix.
+    - name: JDK_JAVA_OPTIONS
+      value: -XX:-UseBASE64Intrinsics
   envFrom:
     - secretRef:
         name: fint-utdanning-ot-adapter-op
